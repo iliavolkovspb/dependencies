@@ -24,9 +24,9 @@ def fetch_crates():
         cargo_lockfile = "@vaticle_dependencies//library/crates:Cargo.lock",
         manifests = ["@vaticle_dependencies//library/crates:Cargo.toml"],
         annotations = {
-            "librocksdb-sys": [crate.annotation(
-                build_script_env = {"ROCKSDB_LIB_DIR": "./lib"},
-            )],
+            "librocksdb-sys": [
+                crate.annotation(build_script_env = {"ROCKSDB_LIB_DIR": "."}),
+            ],
         },
         supported_platform_triples = [
             "aarch64-apple-darwin",

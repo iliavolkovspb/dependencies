@@ -1,0 +1,78 @@
+#
+# Copyright (C) 2022 Vaticle
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+version: 2.1
+orbs:
+  win: circleci/windows@2.0.0
+commands:
+  install-bazel-linux:
+    steps:
+      - run: curl -OL https://raw.githubusercontent.com/vaticle/dependencies/master/tool/bazelinstall/linux.sh
+      - run: bash ./linux.sh && rm ./linux.sh
+      - run: curl -OL https://raw.githubusercontent.com/vaticle/dependencies/master/tool/bazelinstall/rbe.sh
+      - run: bash ./rbe.sh && rm ./rbe.sh
+
+  install-bazel-mac:
+    steps:
+      - run: curl -OL https://raw.githubusercontent.com/vaticle/dependencies/master/tool/bazelinstall/mac.sh
+      - run: bash ./mac.sh && rm ./mac.sh
+
+  run-bazel:
+    parameters:
+      command:
+        type: string
+    steps:
+      - run:
+          command: bazel run @vaticle_dependencies//tool/bazelrun:rbe -- << parameters.command >>
+          no_output_timeout: 120m
+
+jobs:
+  deploy-speedb-shared-library-mac-arm64:
+    macos:
+      xcode: "13.4.1"
+    working_directory: ~/dependencies
+    steps:
+      - checkout
+      - run:
+          git clone https://github.com/speedb-io/speedb.git
+          cd speedb
+          make PLATFORM_SHARED_VERSIONED=false LIBNAME=libspeedb EXTRA_CXXFLAGS="-target x86_64-apple-darwin" EXTRA_CCFLAGS="-target x86_64-apple-darwin" EXTRA_LDFLAGS="-target x86_64-apple-darwin -Wl,-install_name,@executable_path/libspeedb.dylib" shared_lib -j 8
+  deploy-speedb-shared-library-mac-x86_64:
+    macos:
+      xcode: "13.4.1"
+    working_directory: ~/dependencies
+    steps:
+      - checkout
+      - run:
+          git clone https://github.com/speedb-io/speedb.git
+          cd speedb
+          make PLATFORM_SHARED_VERSIONED=false LIBNAME=libspeedb EXTRA_CXXFLAGS="-target arm64-apple-darwin" EXTRA_CCFLAGS="-target arm64-apple-darwin" EXTRA_LDFLAGS="-target arm64-apple-darwin -Wl,-install_name,@executable_path/libspeedb.dylib" shared_lib -j 8
+
+workflows:
+  dependencies:
+    jobs:
+      - deploy-speedb-shared-library-mac-arm64:
+          filters:
+            branches:
+              only:
+                - deploy-speedb
+      - deploy-speedb-shared-library-mac-x86_64:
+          filters:
+            branches:
+              only:
+                - deploy-speedb
+

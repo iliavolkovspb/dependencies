@@ -61,5 +61,5 @@ fun make_arm64_host(rocksDir: Path) {
 
 fun make_x86_64_host(rocksDir: Path) {
     val makeVars = mapOf("TARGET_ARCHITECTURE" to "arm64")
-    bash("arch -x86_64 make shared_lib -j", rocksDir, makeVars, true);
+    bash("arch -x86_64 make shared_lib -j 2", rocksDir, makeVars, true);
 }

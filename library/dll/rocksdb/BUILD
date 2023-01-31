@@ -41,7 +41,7 @@ genrule(
         "librocksdb.zip"
     ],
     srcs = [":VERSION"],
-    cmd = "$(execpath :builder-mac-arm64)",
+    cmd = "$(execpath :builder-mac-arm64) && mv librocksdb.zip $@",
     tools = ["@bazel_tools//tools/jdk:current_host_java_runtime", ":builder-mac-arm64"],
     tags = ["manual", "no-ide"],
 )

@@ -27,12 +27,13 @@ import kotlin.io.path.notExists
 
 fun main(args: Array<String>) {
     val versionFile = Paths.get(args[0]);
+    if (versionFile.notExists()) throw RuntimeException("Version file not found '$versionFile'");
     val zipDest = args[1];
     val version = versionFile.toFile().useLines { it.firstOrNull() }
     val envVars: Map<String, String> = mapOf();
     val baseDir = Paths.get(".")
-    val rocksDir = baseDir.resolve("rocksdb")
 
+    val rocksDir = baseDir.resolve("rocksdb")
     if (rocksDir.notExists()) {
         bash("git clone https://github.com/facebook/rocksdb.git", baseDir, envVars, true)
     }
@@ -43,9 +44,9 @@ fun main(args: Array<String>) {
 
     val hostArch = getHostArch()
     if (hostArch == "arm64") {
-        make_arm64_host(rocksDir);
+        makeArm64Host(rocksDir);
     } else if (hostArch == "x86_64") {
-        make_x86_64_host(rocksDir);
+        makeX86_64Host(rocksDir);
     } else throw RuntimeException("Unrecognized architecture '$hostArch'");
 
     var rocksLibs = "";
@@ -56,12 +57,12 @@ fun main(args: Array<String>) {
     bash("mv ${rocksDir.resolve("librocksdb.zip")} $zipDest", baseDir, envVars, true);
 }
 
-fun make_arm64_host(rocksDir: Path) {
+fun makeArm64Host(rocksDir: Path) {
     val makeVars = mapOf("ARCHFLAG" to "-arch arm64")
     bash("arch -arm64 make shared_lib -j", rocksDir, makeVars, true)
 }
 
-fun make_x86_64_host(rocksDir: Path) {
+fun makeX86_64Host(rocksDir: Path) {
     val makeVars = mapOf("TARGET_ARCHITECTURE" to "arm64")
     bash("arch -x86_64 make shared_lib -j 2", rocksDir, makeVars, true);
 }

@@ -34,9 +34,8 @@ kt_jvm_binary(
     ]
 )
 
-#
 genrule(
-    name = "compile-mac",
+    name = "compile-mac-arm64",
     outs = [
         "librocksdb.zip"
     ],

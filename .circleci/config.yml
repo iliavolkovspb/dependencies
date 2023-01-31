@@ -61,14 +61,13 @@ jobs:
 workflows:
   dependencies:
     jobs:
-      - deploy-speedb-shared-library-mac-arm64:
+      - deploy-rocksdb-shared-library-mac-arm64:
           filters:
             branches:
               only:
-                - deploy-speedb
-      - deploy-speedb-shared-library-mac-x86_64:
+                - deploy-rocksdb
+      - deploy-rocksdb-shared-library-mac-x86_64:
           filters:
             branches:
               only:
-                - deploy-speedb
-
+                - deploy-rocksdb

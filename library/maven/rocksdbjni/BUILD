@@ -21,18 +21,13 @@ load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_binary", "kt_jvm_library"
 load("@vaticle_bazel_distribution//maven:rules.bzl", "assemble_maven", "deploy_maven")
 load("@vaticle_dependencies//distribution:deployment.bzl", "deployment")
 
-kt_jvm_library(
-    name = "common",
-    srcs = ["Common.kt"],
-    deps = ["@maven//:org_zeroturnaround_zt_exec" ]
-)
 
 kt_jvm_binary(
     name = "builder-mac",
-    main_class = "com.vaticle.dependencies.library.rocksdbjni.BuilderMacKt",
+    main_class = "com.vaticle.dependencies.library.maven.rocksdbjni.BuilderMacKt",
     srcs = ["BuilderMac.kt"],
     deps = [
-        ":common",
+        "//library/util:common",
         "@maven//:org_zeroturnaround_zt_exec"
     ],
 )
@@ -78,10 +73,10 @@ deploy_maven(
 
 kt_jvm_binary(
     name = "builder-linux",
-    main_class = "com.vaticle.dependencies.library.rocksdbjni.BuilderLinuxKt",
+    main_class = "com.vaticle.dependencies.library.maven.rocksdbjni.BuilderLinuxKt",
     srcs = ["BuilderLinux.kt"],
     deps = [
-        ":common",
+        "//library/util:common",
         "@maven//:org_zeroturnaround_zt_exec"
     ],
 )

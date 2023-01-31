@@ -7,34 +7,34 @@ fun main() {
         val baseDir = Paths.get(".")
         val version = Paths.get("library").resolve("rocksdbjni").resolve("VERSION").toFile().useLines { it.firstOrNull() }
 
-        val javaHome = Paths.get("/usr/lib/jvm/java-11-openjdk-amd64")
+        val envVars = mapOf("JAVA_HOME" to Paths.get("/usr/lib/jvm/java-11-openjdk-amd64").toAbsolutePath().toString());
 
-        bash("git clone https://github.com/facebook/rocksdb.git", baseDir, javaHome, true)
+        com.vaticle.dependencies.library.util.bash("git clone https://github.com/facebook/rocksdb.git", baseDir, envVars, true)
 
         val rocksDbDir = Paths.get("rocksdb").toAbsolutePath()
-        bash("git checkout v$version", rocksDbDir, javaHome, true)
+        com.vaticle.dependencies.library.util.bash("git checkout v$version", rocksDbDir, envVars, true)
 
-        bash("sudo apt install cmake", rocksDbDir, javaHome, false)
+        com.vaticle.dependencies.library.util.bash("sudo apt install cmake", rocksDbDir, envVars, false)
 
-        bash("make clean jclean", rocksDbDir, javaHome, true)
+        com.vaticle.dependencies.library.util.bash("make clean jclean", rocksDbDir, envVars, true)
 
         // use 'make DEBUG_LEVEL=0 ...' to build production binary
-        bash("make -j8 rocksdbjava", rocksDbDir, javaHome, true)
+        com.vaticle.dependencies.library.util.bash("make -j8 rocksdbjava", rocksDbDir, envVars, true)
 
         println(">>>>>>>>>>>>>>>>>>>>> baseDir")
-        bash("ls ${baseDir}", rocksDbDir, javaHome, true)
+        com.vaticle.dependencies.library.util.bash("ls ${baseDir}", rocksDbDir, envVars, true)
         println(">>>>>>>>>>>>>>>>>>>>>")
 
         println(">>>>>>>>>>>>>>>>>>>>> rocksDbDir")
-        bash("ls ${rocksDbDir}", rocksDbDir, javaHome, true)
+        com.vaticle.dependencies.library.util.bash("ls ${rocksDbDir}", rocksDbDir, envVars, true)
         println(">>>>>>>>>>>>>>>>>>>>>")
 
         println(">>>>>>>>>>>>>>>>>>>>> rocksDbDir.resolve(\"java\")")
-        bash("ls ${rocksDbDir.resolve("java")}", rocksDbDir, javaHome, true)
+        com.vaticle.dependencies.library.util.bash("ls ${rocksDbDir.resolve("java")}", rocksDbDir, envVars, true)
         println(">>>>>>>>>>>>>>>>>>>>>")
 
         println(">>>>>>>>>>>>>>>>>>>>> rocksDbDir.resolve(\"java\").resolve(\"target\")")
-        bash("ls ${rocksDbDir.resolve("java").resolve("target")}", rocksDbDir, javaHome, true)
+        com.vaticle.dependencies.library.util.bash("ls ${rocksDbDir.resolve("java").resolve("target")}", rocksDbDir, envVars, true)
         println(">>>>>>>>>>>>>>>>>>>>>")
 
         val versionedJarName = "rocksdbjni-$version-linux64.jar"
@@ -48,7 +48,7 @@ fun main() {
         jar.copyTo(destPath)
         println("4")
         println(">>>>>>>>>>>>>>>>>>>>> destPath")
-        bash("ls ${destPath.parent}", rocksDbDir, javaHome, true)
+        com.vaticle.dependencies.library.util.bash("ls ${destPath.parent}", rocksDbDir, envVars, true)
         println(">>>>>>>>>>>>>>>>>>>>>")
     } catch (e: Throwable) {
         e.printStackTrace()

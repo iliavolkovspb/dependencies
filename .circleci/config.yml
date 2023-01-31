@@ -47,9 +47,10 @@ jobs:
     working_directory: ~/dependencies
     steps:
       - checkout
-      - run: git clone https://github.com/speedb-io/speedb.git
-      - run: cd speedb
-      - run: make PLATFORM_SHARED_VERSIONED=false LIBNAME=libspeedb EXTRA_CXXFLAGS="-target x86_64-apple-darwin" EXTRA_CCFLAGS="-target x86_64-apple-darwin" EXTRA_LDFLAGS="-target x86_64-apple-darwin -Wl,-install_name,@executable_path/libspeedb.dylib" shared_lib -j 8
+      - bazel build //library/dll/rocksdb:compile-mac --verbose_failures
+#      - run: git clone https://github.com/speedb-io/speedb.git
+#      - run: cd speedb
+#      - run: make PLATFORM_SHARED_VERSIONED=false LIBNAME=libspeedb EXTRA_CXXFLAGS="-target x86_64-apple-darwin" EXTRA_CCFLAGS="-target x86_64-apple-darwin" EXTRA_LDFLAGS="-target x86_64-apple-darwin -Wl,-install_name,@executable_path/libspeedb.dylib" shared_lib -j 8
   deploy-speedb-shared-library-mac-x86_64:
     macos:
       xcode: "13.4.1"

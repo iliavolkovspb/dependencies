@@ -65,9 +65,9 @@ workflows:
           filters:
             branches:
               only:
-                - deploy-rocksdb
+                - deploy-speedb
       - deploy-rocksdb-shared-library-mac-x86_64:
           filters:
             branches:
               only:
-                - deploy-rocksdb
+                - deploy-speedb

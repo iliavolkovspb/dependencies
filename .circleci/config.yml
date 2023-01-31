@@ -44,6 +44,7 @@ jobs:
   deploy-speedb-shared-library-mac-arm64:
     macos:
       xcode: "13.4.1"
+    resource_class: large
     working_directory: ~/dependencies
     steps:
       - checkout
@@ -55,6 +56,7 @@ jobs:
   deploy-speedb-shared-library-mac-x86_64:
     macos:
       xcode: "13.4.1"
+    resource_class: large
     working_directory: ~/dependencies
     steps:
       - checkout

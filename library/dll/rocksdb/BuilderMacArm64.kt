@@ -25,7 +25,8 @@ import java.nio.file.Paths
 import kotlin.io.path.forEachDirectoryEntry
 import kotlin.io.path.notExists
 
-fun main() {
+fun main(args: Array<String>) {
+    val zipDest = args.get(0);
     val baseDir = Paths.get(".")
     val version = Paths.get("library").resolve("dll").resolve("rocksdb").resolve("VERSION").toFile().useLines { it.firstOrNull() }
     val envVars: Map<String, String> = mapOf();
@@ -51,7 +52,8 @@ fun main() {
     rocksDir.forEachDirectoryEntry(glob = "librocksdb*.dylib") {
         rocksLibs += "${it.fileName} "
     }
-    bash("zip librocksdb.zip ${rocksLibs.trim()}", rocksDir, envVars, false)
+    bash("zip librocksdb.zip ${rocksLibs.trim()}", rocksDir, envVars, true)
+    bash("mv ${rocksDir.resolve("librocksdb.zip")} $zipDest", baseDir, envVars, true);
 }
 
 fun make_arm64_host(rocksDir: Path) {

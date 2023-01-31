@@ -39,6 +39,8 @@ fun main(args: Array<String>) {
     }
     bash("git checkout v$version", rocksDir, envVars, true)
 
+    bash("pwd", rocksDir, envVars, true);
+
     bash("brew install cmake", rocksDir, envVars, false)
     bash("make clean jclean", rocksDir, envVars, true)
 
@@ -58,11 +60,18 @@ fun main(args: Array<String>) {
 }
 
 fun makeArm64Host(rocksDir: Path) {
-    val makeVars = mapOf("ARCHFLAG" to "-arch arm64")
+    val makeVars = mapOf(
+            "ARCHFLAG" to "-arch arm64",
+            "DISABLE_WARNING_AS_ERROR" to "true",
+    )
     bash("arch -arm64 make shared_lib -j", rocksDir, makeVars, true)
 }
 
 fun makeX86_64Host(rocksDir: Path) {
-    val makeVars = mapOf("TARGET_ARCHITECTURE" to "arm64")
+    val makeVars = mapOf(
+            "ARCHFLAG" to "-arch arm64",
+            "DISABLE_WARNING_AS_ERROR" to "true",
+            "EXTRA_LDFLAGS" to "-target arm64-apple-darwin"
+    )
     bash("arch -x86_64 make shared_lib -j 2", rocksDir, makeVars, true);
 }

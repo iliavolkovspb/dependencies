@@ -20,9 +20,9 @@ package com.vaticle.dependencies.library.util
 
 import org.zeroturnaround.exec.ProcessExecutor
 import org.zeroturnaround.exec.ProcessResult
-import java.lang.RuntimeException
 import java.nio.file.Path
 import java.nio.file.Paths
+import kotlin.RuntimeException
 
 
 fun bash(script: String, baseDir: Path, envVars: Map<String, String>, expectExitValueNormal: Boolean, quiet: Boolean = false): ProcessResult {
@@ -57,24 +57,11 @@ fun bash(script: List<String>, baseDir: Path, envVars: Map<String, String>, expe
     return execution
 }
 
-fun get_host_arch(rocksDir: Path): String {
-    bash(listOf("arch"), rocksDir, mapOf(), false, false);
-
-
-//    val translated = bash(listOf("/bin/sh", "-c", "sysctl sysctl.proc_translated"), rocksDir, mapOf(), false).outputUTF8().trim()
-//    println(translated)
-//    val isTranslatedProcessor = Integer.parseInt(translated.split(":")[1].trim()) == 1;
-    val system = bash("uname -a", rocksDir, mapOf(), false, false).outputUTF8().trim();
-
+fun getHostArch(): String {
+    val system = bash("uname -a", Paths.get("."), mapOf(), true, true).outputUTF8().trim();
     if (system.contains("arm64")) {
-        return "arm64";
-    } else return "x86_64";
-
-//    if (system.contains("x86") || system.contains("amd64")) {
-//    }
-//        if (isTranslatedProcessor) return "arm64" else return "x86_64"
-//    } else if (system.contains("arm64")) {
-//        if (isTranslatedProcessor)  return "x86_64" else return "arm64"
-//    } else throw RuntimeException("System unrecognised: must be x86/amd64 or arm64: $system");
-//    return "arm64";
+        return "arm64"
+    } else if (system.contains("x86") || system.contains("amd64") || system.contains("i386")) {
+        return "x86_64"
+    } else throw RuntimeException("Could not parse host architecture from '$system'.")
 }

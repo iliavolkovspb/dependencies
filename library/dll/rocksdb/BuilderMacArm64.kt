@@ -19,29 +19,29 @@
 package com.vaticle.dependencies.library.dll.rocksdb
 
 import com.vaticle.dependencies.library.util.bash
-import com.vaticle.dependencies.library.util.get_host_arch
+import com.vaticle.dependencies.library.util.getHostArch
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.io.path.forEachDirectoryEntry
 import kotlin.io.path.notExists
 
 fun main(args: Array<String>) {
-    val zipDest = args.get(0);
-    val baseDir = Paths.get(".")
-    val version = Paths.get("library").resolve("dll").resolve("rocksdb").resolve("VERSION").toFile().useLines { it.firstOrNull() }
+    val versionFile = Paths.get(args[0]);
+    val zipDest = args[1];
+    val version = versionFile.toFile().useLines { it.firstOrNull() }
     val envVars: Map<String, String> = mapOf();
-    val rocksDir = Paths.get("rocksdb")
+    val baseDir = Paths.get(".")
+    val rocksDir = baseDir.resolve("rocksdb")
 
-    if (baseDir.resolve(rocksDir).notExists()) {
+    if (rocksDir.notExists()) {
         bash("git clone https://github.com/facebook/rocksdb.git", baseDir, envVars, true)
     }
-
     bash("git checkout v$version", rocksDir, envVars, true)
 
     bash("brew install cmake", rocksDir, envVars, false)
     bash("make clean jclean", rocksDir, envVars, true)
 
-    val hostArch = get_host_arch(rocksDir)
+    val hostArch = getHostArch()
     if (hostArch == "arm64") {
         make_arm64_host(rocksDir);
     } else if (hostArch == "x86_64") {

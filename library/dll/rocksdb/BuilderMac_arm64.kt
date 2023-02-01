@@ -19,42 +19,21 @@
 package com.vaticle.dependencies.library.dll.rocksdb
 
 import com.vaticle.dependencies.library.util.bash
-import com.vaticle.dependencies.library.util.getUnixHostArch
 import java.nio.file.Path
-import java.nio.file.Paths
-import kotlin.io.path.notExists
 
 fun main(args: Array<String>) {
-    val versionFile = Paths.get(args[0]);
-    if (versionFile.notExists()) throw RuntimeException("Version file not found '$versionFile'");
-    val zipDest = args[1];
-    val version = versionFile.toFile().useLines { it.firstOrNull() }
+    if (args.size != 2) throw RuntimeException("Expected 2 arguments: <version> <outDir>")
+    val version = args[0]
+    val outFile = args[1]
+    if (!outFile.endsWith(".zip")) throw RuntimeException("Expected out file to be a .zip")
+    val buildDir = buildMac(version, ::makeHost_arm64, ::makeHost_x86_64);
+    validateFileDescription(buildDir, "librocksdb.dylib", "arm")
     val zipName = "librocksdb.zip"
-    val envVars: Map<String, String> = mapOf();
-    val baseDir = Paths.get(".")
-
-    val rocksDir = baseDir.resolve("rocksdb")
-
-    checkoutRocksRepo(baseDir, rocksDir, "v$version", envVars);
-    installPrerequisites();
-
-    bash("make clean jclean", rocksDir, envVars, true)
-
-    val hostArch = getUnixHostArch()
-    if (hostArch == "arm64") {
-        makeArm64Host(rocksDir);
-    } else if (hostArch == "x86_64") {
-        makeX86_64Host(rocksDir);
-    } else throw RuntimeException("Unrecognized architecture '$hostArch'");
-
-    validateFileDescription(rocksDir, "librocksdb.dylib", "arm");
-    createZip(zipName, rocksDir, "librocksdb*.dylib")
-
-
-    bash("mv ${rocksDir.resolve(zipName)} $zipDest", baseDir, envVars, true);
+    createZip(zipName, buildDir, "librocksdb*.dylib")
+    bash("mv ${buildDir.resolve(zipName)} $outFile", buildDir, mapOf(), true)
 }
 
-private fun makeArm64Host(rocksDir: Path) {
+private fun makeHost_arm64(rocksDir: Path) {
     val makeVars = mapOf(
             "ARCHFLAG" to "-arch arm64",
             "DISABLE_WARNING_AS_ERROR" to "true",
@@ -62,7 +41,7 @@ private fun makeArm64Host(rocksDir: Path) {
     bash("arch -arm64 make shared_lib -j", rocksDir, makeVars, true)
 }
 
-private fun makeX86_64Host(rocksDir: Path) {
+private fun makeHost_x86_64(rocksDir: Path) {
     val makeVars = mapOf(
             "ARCHFLAG" to "-arch arm64",
             "EXTRA_LDFLAGS" to "-target arm64-apple-darwin",

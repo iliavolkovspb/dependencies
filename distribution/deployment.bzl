@@ -28,6 +28,8 @@ deployment = {
     "crate.release": "https://crates.io",
     "crate.snapshot": "https://repo.vaticle.com/repository/crates-snapshot/",
 
+    "dll": "https://repo.vaticle.com/repository/dll",
+
     "helm.release": "https://repo.vaticle.com/repository/helm/",
     "helm.snapshot": "https://repo.vaticle.com/repository/helm-snapshot/",
 

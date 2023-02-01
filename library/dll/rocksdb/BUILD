@@ -20,6 +20,8 @@ package(default_visibility = ["//visibility:public"])
 
 load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_binary", "kt_jvm_library")
 load("@vaticle_dependencies//distribution:deployment.bzl", "deployment")
+load("@vaticle_bazel_distribution//artifact:rules.bzl", "deploy_artifact")
+load("@vaticle_dependencies//distribution:deployment.bzl", "deployment")
 
 kt_jvm_binary(
     name = "builder-mac-arm64",
@@ -29,9 +31,6 @@ kt_jvm_binary(
         "//library/util:common",
         "@maven//:org_zeroturnaround_zt_exec"
     ],
-    data = [
-        ":VERSION"
-    ]
 )
 
 genrule(
@@ -39,10 +38,18 @@ genrule(
     outs = [
         "librocksdb-arm64.zip"
     ],
-    srcs = [":VERSION"],
-    cmd = "$(execpath :builder-mac-arm64) $(location :VERSION) $@",
+    cmd = "$(execpath :builder-mac-arm64) $(version) $@",
     tools = ["@bazel_tools//tools/jdk:current_host_java_runtime", ":builder-mac-arm64"],
     tags = ["manual", "no-ide"],
+)
+
+deploy_artifact(
+    name = "deploy-mac-arm64",
+    target = ":compile-mac-arm64",
+    artifact_group = "com.facebook",
+    artifact_name = "librocksdb-mac-arm64-{version}.tar.gz",
+    release = deployment['dll'],
+    snapshot = deployment['dll'],
 )
 
 kt_jvm_binary(
@@ -53,9 +60,6 @@ kt_jvm_binary(
         "//library/util:common",
         "@maven//:org_zeroturnaround_zt_exec"
     ],
-    data = [
-        ":VERSION"
-    ]
 )
 
 genrule(
@@ -63,87 +67,16 @@ genrule(
     outs = [
         "librocksdb-x86_64.zip"
     ],
-    srcs = [":VERSION"],
-    cmd = "$(execpath :builder-mac-x86_64) $(location :VERSION) $@",
+    cmd = "$(execpath :builder-mac-x86_64) $(version) $@",
     tools = ["@bazel_tools//tools/jdk:current_host_java_runtime", ":builder-mac-x86_64"],
     tags = ["manual", "no-ide"],
 )
 
-#
-#java_import(
-#    name = "rocksdbjni-dev-mac",
-#    jars = ["rocksdbjni-osx.jar"],
-#    srcjar = "rocksdbjni-sources.jar",
-#    tags = ["manual", "no-ide", "maven_coordinates=org.rocksdb:rocksdbjni-dev-mac:{pom_version}"],
-#)
-#
-#assemble_maven(
-#    name = "assemble-maven-mac",
-#    project_description = "RocksDB JNI Mac Dev release by Vaticle",
-#    project_name = "RocksDB JNI Mac Dev",
-#    project_url = "https://github.com/vaticle/dependencies",
-#    scm_url = "https://github.com/vaticle/dependencies",
-#    target = ":rocksdbjni-dev-mac",
-#    version_file = "VERSION",
-#    workspace_refs = "@vaticle_dependencies_workspace_refs//:refs.json",
-#    tags = ["manual", "no-ide"],
-#)
-#
-#deploy_maven(
-#    name = "deploy-maven-mac",
-#    target = ":assemble-maven-mac",
-#    snapshot = deployment["maven.snapshot"],
-#    release = deployment["maven.release"],
-#    tags = ["manual", "no-ide"],
-#)
-#
-#kt_jvm_binary(
-#    name = "builder-linux",
-#    main_class = "com.vaticle.dependencies.library.maven.rocksdbjni.BuilderLinuxKt",
-#    srcs = ["BuilderLinux.kt"],
-#    deps = [
-#        ":common",
-#        "@maven//:org_zeroturnaround_zt_exec"
-#    ],
-#)
-#
-#genrule(
-#    name = "compile-linux",
-#    outs = [
-#        "rocksdbjni-linux.jar",
-##        "rocksdbjni-sources.jar", // TODO: enable once we found a way to generate source jar under Linux
-#    ],
-#    srcs = ["VERSION"],
-#    cmd = "$(execpath :builder-linux) && read -a outs <<< '$(OUTS)' && mv rocksdbjni-linux.jar $${outs[0]}",
-#    tools = ["@bazel_tools//tools/jdk:current_host_java_runtime", ":builder-linux"],
-#    tags = ["manual", "no-ide"],
-#)
-#
-#java_import(
-#    name = "rocksdbjni-dev-linux",
-#    jars = [
-#        "rocksdbjni-linux.jar"
-##        "rocksdbjni-sources.jar", // TODO: enable once we found a way to generate source jar under Linux
-#    ],
-#    tags = ["manual", "no-ide", "maven_coordinates=org.rocksdb:rocksdbjni-dev-linux:{pom_version}"],
-#)
-#
-#assemble_maven(
-#    name = "assemble-maven-linux",
-#    target = ":rocksdbjni-dev-linux",
-#    version_file = "VERSION",
-#    tags = ["manual", "no-ide"],
-#    project_description = "RocksDB JNI Mac Dev release by Vaticle",
-#    project_name = "RocksDB JNI Mac Dev",
-#    project_url = "https://github.com/vaticle/dependencies",
-#    scm_url = "https://github.com/vaticle/dependencies",
-#    workspace_refs = "@vaticle_dependencies_workspace_refs//:refs.json",
-#)
-#
-#deploy_maven(
-#    name = "deploy-maven-linux",
-#    target = ":assemble-maven-linux",
-#    snapshot = deployment["maven.snapshot"],
-#    release = deployment["maven.release"],
-#    tags = ["manual", "no-ide"],
-#)
+deploy_artifact(
+    name = "deploy-mac-x86_64",
+    target = ":compile-mac-x86_64",
+    artifact_group = "com.facebook",
+    artifact_name = "librocksdb-mac-x86_64-{version}.tar.gz",
+    release = deployment['dll'],
+    snapshot = deployment['dll'],
+)

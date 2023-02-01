@@ -18,21 +18,41 @@
 
 package com.vaticle.dependencies.library.dll.rocksdb
 
+import com.vaticle.dependencies.library.util.OS
 import com.vaticle.dependencies.library.util.bash
+import com.vaticle.dependencies.library.util.getOS
+import com.vaticle.dependencies.library.util.getUnixHostArch
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.io.path.forEachDirectoryEntry
 import kotlin.io.path.notExists
 
-fun checkoutRocksRepo(baseDir: Path, rocksDir: Path, gitVersion: String, envVars: Map<String, String> = mapOf()) {
+fun buildMac(gitVersion: String, makeHost_arm64: (Path) -> Unit, makeHost_x86_64: (Path) -> Unit): Path {
+    if (getOS() != OS.MAC) throw RuntimeException("Mac builds only run on Mac operating systems.")
+    val envVars: Map<String, String> = mapOf()
+    val baseDir = Paths.get(".")
+    val rocksDir = baseDir.resolve("rocksdb")
+    checkoutRocksRepo(baseDir, rocksDir, gitVersion, envVars);
+    installPrerequisites();
+    bash("make clean jclean", rocksDir, envVars, true)
+
+    val hostArch = getUnixHostArch()
+    if (hostArch == "arm64") {
+        makeHost_arm64(rocksDir);
+    } else if (hostArch == "x86_64") {
+        makeHost_x86_64(rocksDir);
+    } else throw RuntimeException("Unrecognized architecture '$hostArch'");
+    return rocksDir;
+}
+
+private fun checkoutRocksRepo(baseDir: Path, rocksDir: Path, gitVersion: String, envVars: Map<String, String> = mapOf()) {
     if (rocksDir.notExists()) {
         bash("git clone https://github.com/facebook/rocksdb.git", baseDir, envVars, true)
     }
     bash("git checkout $gitVersion", rocksDir, envVars, true)
-
 }
 
-fun installPrerequisites() {
+private fun installPrerequisites() {
     bash("brew install cmake", Paths.get("."), mapOf(), false)
 }
 

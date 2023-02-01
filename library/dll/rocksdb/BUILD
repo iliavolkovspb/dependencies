@@ -23,8 +23,8 @@ load("@vaticle_dependencies//distribution:deployment.bzl", "deployment")
 
 kt_jvm_binary(
     name = "builder-mac-arm64",
-    main_class = "com.vaticle.dependencies.library.dll.rocksdb.BuilderMacArm64Kt",
-    srcs = ["BuilderMacArm64.kt"],
+    main_class = "com.vaticle.dependencies.library.dll.rocksdb.BuilderMac_arm64Kt",
+    srcs = ["BuilderMac_arm64.kt", "BuilderMacCommon.kt"],
     deps = [
         "//library/util:common",
         "@maven//:org_zeroturnaround_zt_exec"
@@ -37,13 +37,38 @@ kt_jvm_binary(
 genrule(
     name = "compile-mac-arm64",
     outs = [
-        "librocksdb.zip"
+        "librocksdb-arm64.zip"
     ],
     srcs = [":VERSION"],
     cmd = "$(execpath :builder-mac-arm64) $(location :VERSION) $@",
     tools = ["@bazel_tools//tools/jdk:current_host_java_runtime", ":builder-mac-arm64"],
     tags = ["manual", "no-ide"],
 )
+
+kt_jvm_binary(
+    name = "builder-mac-x86_64",
+    main_class = "com.vaticle.dependencies.library.dll.rocksdb.BuilderMac_x86_64Kt",
+    srcs = ["BuilderMac_x86_64.kt", "BuilderMacCommon.kt"],
+    deps = [
+        "//library/util:common",
+        "@maven//:org_zeroturnaround_zt_exec"
+    ],
+    data = [
+        ":VERSION"
+    ]
+)
+
+genrule(
+    name = "compile-mac-x86_64",
+    outs = [
+        "librocksdb-x86_64.zip"
+    ],
+    srcs = [":VERSION"],
+    cmd = "$(execpath :builder-mac-x86_64) $(location :VERSION) $@",
+    tools = ["@bazel_tools//tools/jdk:current_host_java_runtime", ":builder-mac-x86_64"],
+    tags = ["manual", "no-ide"],
+)
+
 #
 #java_import(
 #    name = "rocksdbjni-dev-mac",

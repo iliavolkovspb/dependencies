@@ -19,10 +19,9 @@
 package com.vaticle.dependencies.library.dll.rocksdb
 
 import com.vaticle.dependencies.library.util.bash
-import com.vaticle.dependencies.library.util.getHostArch
+import com.vaticle.dependencies.library.util.getUnixHostArch
 import java.nio.file.Path
 import java.nio.file.Paths
-import kotlin.io.path.forEachDirectoryEntry
 import kotlin.io.path.notExists
 
 fun main(args: Array<String>) {
@@ -30,48 +29,44 @@ fun main(args: Array<String>) {
     if (versionFile.notExists()) throw RuntimeException("Version file not found '$versionFile'");
     val zipDest = args[1];
     val version = versionFile.toFile().useLines { it.firstOrNull() }
+    val zipName = "librocksdb.zip"
     val envVars: Map<String, String> = mapOf();
     val baseDir = Paths.get(".")
 
     val rocksDir = baseDir.resolve("rocksdb")
-    if (rocksDir.notExists()) {
-        bash("git clone https://github.com/facebook/rocksdb.git", baseDir, envVars, true)
-    }
-    bash("git checkout v$version", rocksDir, envVars, true)
 
-    bash("pwd", rocksDir, envVars, true);
+    checkoutRocksRepo(baseDir, rocksDir, "v$version", envVars);
+    installPrerequisites();
 
-    bash("brew install cmake", rocksDir, envVars, false)
     bash("make clean jclean", rocksDir, envVars, true)
 
-    val hostArch = getHostArch()
+    val hostArch = getUnixHostArch()
     if (hostArch == "arm64") {
         makeArm64Host(rocksDir);
     } else if (hostArch == "x86_64") {
         makeX86_64Host(rocksDir);
     } else throw RuntimeException("Unrecognized architecture '$hostArch'");
 
-    var rocksLibs = "";
-    rocksDir.forEachDirectoryEntry(glob = "librocksdb*.dylib") {
-        rocksLibs += "${it.fileName} "
-    }
-    bash("zip librocksdb.zip ${rocksLibs.trim()}", rocksDir, envVars, true)
-    bash("mv ${rocksDir.resolve("librocksdb.zip")} $zipDest", baseDir, envVars, true);
+    validateFileDescription(rocksDir, "librocksdb.dylib", "x86");
+    createZip(zipName, rocksDir, "librocksdb*.dylib")
+
+    bash("mv ${rocksDir.resolve(zipName)} $zipDest", baseDir, envVars, true);
 }
 
-fun makeArm64Host(rocksDir: Path) {
+private fun makeArm64Host(rocksDir: Path) {
     val makeVars = mapOf(
-            "ARCHFLAG" to "-arch arm64",
+            "ARCHFLAG" to "-arch x86_64",
+            "EXTRA_LDFLAGS" to "-target x86_64-apple-darwin",
             "DISABLE_WARNING_AS_ERROR" to "true",
     )
     bash("arch -arm64 make shared_lib -j", rocksDir, makeVars, true)
 }
 
-fun makeX86_64Host(rocksDir: Path) {
+private fun makeX86_64Host(rocksDir: Path) {
     val makeVars = mapOf(
-            "ARCHFLAG" to "-arch arm64",
-            "DISABLE_WARNING_AS_ERROR" to "true",
-            "EXTRA_LDFLAGS" to "-target arm64-apple-darwin"
+            "ARCHFLAG" to "-arch x86_64",
+            "DISABLE_WARNING_AS_ERROR" to "true"
     )
+    // note: over-parallelising can cause nontermination in CircleCI builds
     bash("arch -x86_64 make shared_lib -j 2", rocksDir, makeVars, true);
 }

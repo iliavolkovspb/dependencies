@@ -57,7 +57,7 @@ fun bash(script: List<String>, baseDir: Path, envVars: Map<String, String>, expe
     return execution
 }
 
-fun getHostArch(): String {
+fun getUnixHostArch(): String {
     val system = bash("uname -a", Paths.get("."), mapOf(), true, true).outputUTF8().trim();
     if (system.contains("arm64")) {
         return "arm64"

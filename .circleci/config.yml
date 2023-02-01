@@ -48,7 +48,7 @@ jobs:
     steps:
       - checkout
       - install-bazel-mac
-      - run: bazel build //library/dll/rocksdb:compile-mac-arm
+      - run: bazel build //library/dll/rocksdb:compile-mac-arm64
   deploy-rocksdb-shared-library-mac-x86_64:
     macos:
       xcode: "13.4.1"
@@ -56,7 +56,7 @@ jobs:
     steps:
       - checkout
       - install-bazel-mac
-      - run: bazel build //library/dll/rocksdb:compile-mac
+      - run: bazel build //library/dll/rocksdb:compile-mac-x86_64
 
 workflows:
   dependencies:
@@ -65,9 +65,9 @@ workflows:
           filters:
             branches:
               only:
-                - deploy-speedb
+                - deploy-rocks-speedb
       - deploy-rocksdb-shared-library-mac-x86_64:
           filters:
             branches:
               only:
-                - deploy-speedb
+                - deploy-rocks-speedb

@@ -32,17 +32,17 @@ fun buildMac(gitVersion: String, makeHost_arm64: (Path) -> Unit, makeHost_x86_64
     val envVars: Map<String, String> = mapOf()
     val baseDir = Paths.get(".")
     val rocksDir = baseDir.resolve("rocksdb")
-    checkoutRocksRepo(baseDir, rocksDir, gitVersion, envVars);
-    installPrerequisites();
+    checkoutRocksRepo(baseDir, rocksDir, gitVersion, envVars)
+    installPrerequisites()
     bash("make clean jclean", rocksDir, envVars, true)
 
     val hostArch = getUnixHostArch()
     if (hostArch == "arm64") {
-        makeHost_arm64(rocksDir);
+        makeHost_arm64(rocksDir)
     } else if (hostArch == "x86_64") {
-        makeHost_x86_64(rocksDir);
-    } else throw RuntimeException("Unrecognized architecture '$hostArch'");
-    return rocksDir;
+        makeHost_x86_64(rocksDir)
+    } else throw RuntimeException("Unrecognized architecture '$hostArch'")
+    return rocksDir
 }
 
 private fun checkoutRocksRepo(baseDir: Path, rocksDir: Path, gitVersion: String, envVars: Map<String, String> = mapOf()) {
@@ -57,7 +57,7 @@ private fun installPrerequisites() {
 }
 
 fun validateFileDescription(fileDir: Path, fileName: String, expectedFileDescriptionSubstring: String) {
-    val fileDescription = bash("file $fileName", fileDir, mapOf(), true, true).outputUTF8().trim()
+    val fileDescription = bash("file $fileName", fileDir, mapOf(), true ).outputUTF8().trim()
     if (!fileDescription.contains(expectedFileDescriptionSubstring)) {
         throw RuntimeException("File description for '$fileName' missing required '$expectedFileDescriptionSubstring': '$fileDescription'.")
     }

@@ -26,7 +26,7 @@ fun main(args: Array<String>) {
     val version = args[0]
     val outFile = args[1]
     if (!outFile.endsWith(".zip")) throw RuntimeException("Expected out file to be a .zip")
-    val buildDir = buildMac(version, ::makeHost_arm64, ::makeHost_x86_64);
+    val buildDir = buildMac(version, ::makeHost_arm64, ::makeHost_x86_64)
     validateFileDescription(buildDir, "librocksdb.dylib", "arm")
     val zipName = "librocksdb.zip"
     createZip(zipName, buildDir, "librocksdb*.dylib")
@@ -48,5 +48,5 @@ private fun makeHost_x86_64(rocksDir: Path) {
             "DISABLE_WARNING_AS_ERROR" to "true"
     )
     // note: over-parallelising can cause nontermination in CircleCI builds
-    bash("arch -x86_64 make shared_lib -j 2", rocksDir, makeVars, true);
+    bash("arch -x86_64 make shared_lib -j 2", rocksDir, makeVars, true)
 }

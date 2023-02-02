@@ -26,7 +26,7 @@ import kotlin.RuntimeException
 
 
 fun bash(script: String, baseDir: Path, envVars: Map<String, String>, expectExitValueNormal: Boolean, quiet: Boolean = false): ProcessResult {
-    return bash(script.split(" "), baseDir, envVars, expectExitValueNormal, quiet);
+    return bash(script.split(" "), baseDir, envVars, expectExitValueNormal, quiet)
 }
 
 fun bash(script: List<String>, baseDir: Path, envVars: Map<String, String>, expectExitValueNormal: Boolean, quiet: Boolean = false): ProcessResult {
@@ -58,7 +58,7 @@ fun bash(script: List<String>, baseDir: Path, envVars: Map<String, String>, expe
 }
 
 fun getUnixHostArch(): String {
-    val system = bash("uname -a", Paths.get("."), mapOf(), true, true).outputUTF8().trim();
+    val system = bash("uname -a", Paths.get("."), mapOf(), true, true).outputUTF8().trim()
     if (system.contains("arm64")) {
         return "arm64"
     } else if (system.contains("x86") || system.contains("amd64") || system.contains("i386")) {
@@ -71,7 +71,7 @@ enum class OS {
 }
 
 fun getOS(): OS? {
-    val os = System.getProperty("os.name").toLowerCase()
+    val os = System.getProperty("os.name").lowercase()
     return when {
         os.contains("win") -> {
             OS.WINDOWS

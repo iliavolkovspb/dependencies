@@ -48,6 +48,8 @@ jobs:
     steps:
       - checkout
       - install-bazel-mac
+      - run: export DEPLOY_ARTIFACT_USERNAME=$REPO_VATICLE_USERNAME
+      - run: export DEPLOY_ARTIFACT_PASSWORD=$REPO_VATICLE_PASSWORD
       - run: bazel run --define version=$(cat library/dll/rocksdb/VERSION) //library/dll/rocksdb:deploy-mac-arm64 -- release
   deploy-rocksdb-shared-library-mac-x86_64:
     macos:
@@ -56,6 +58,8 @@ jobs:
     steps:
       - checkout
       - install-bazel-mac
+      - run: export DEPLOY_ARTIFACT_USERNAME=$REPO_VATICLE_USERNAME
+      - run: export DEPLOY_ARTIFACT_PASSWORD=$REPO_VATICLE_PASSWORD
       - run: bazel run --define version=$(cat library/dll/rocksdb/VERSION) //library/dll/rocksdb:deploy-mac-x86_64 -- release
 
 workflows:

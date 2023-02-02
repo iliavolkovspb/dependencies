@@ -18,10 +18,9 @@
 
 package(default_visibility = ["//visibility:public"])
 
+load("//distribution:deployment.bzl", "deployment")
 load("@io_bazel_rules_kotlin//kotlin:jvm.bzl", "kt_jvm_binary", "kt_jvm_library")
-load("@vaticle_dependencies//distribution:deployment.bzl", "deployment")
 load("@vaticle_bazel_distribution//artifact:rules.bzl", "deploy_artifact")
-load("@vaticle_dependencies//distribution:deployment.bzl", "deployment")
 
 kt_jvm_binary(
     name = "builder-mac-arm64",
@@ -47,7 +46,7 @@ deploy_artifact(
     name = "deploy-mac-arm64",
     target = ":compile-mac-arm64",
     artifact_group = "com.facebook",
-    artifact_name = "librocksdb-mac-arm64-{version}.tar.gz",
+    artifact_name = "librocksdb-mac-arm64-{version}.zip",
     release = deployment['dll'],
     snapshot = deployment['dll'],
 )
@@ -76,7 +75,7 @@ deploy_artifact(
     name = "deploy-mac-x86_64",
     target = ":compile-mac-x86_64",
     artifact_group = "com.facebook",
-    artifact_name = "librocksdb-mac-x86_64-{version}.tar.gz",
+    artifact_name = "librocksdb-mac-x86_64-{version}.zip",
     release = deployment['dll'],
     snapshot = deployment['dll'],
 )

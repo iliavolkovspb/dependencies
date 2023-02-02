@@ -26,7 +26,7 @@ fun main(args: Array<String>) {
     if (args.size != 2) throw RuntimeException("Expected 2 arguments: <version> <outDir>")
     val version = args[0]
     val outFile = Paths.get(args[1])
-    if (!outFile.endsWith(".zip")) throw RuntimeException("Expected out file to be a .zip")
+    if (!outFile.toString().endsWith(".zip")) throw RuntimeException("Expected out file to be a .zip")
     val buildDir = buildMac(version, ::makeHost_arm64, ::makeHost_x86_64)
     validateFileDescription(buildDir, "librocksdb.dylib", "x86")
     val zipName = "librocksdb.zip"

@@ -33,7 +33,6 @@ fun buildMac(gitVersion: String, makeHost_arm64: (Path) -> Unit, makeHost_x86_64
     val baseDir = Paths.get(".")
     val rocksDir = baseDir.resolve("rocksdb")
     checkoutRocksRepo(baseDir, rocksDir, gitVersion, envVars)
-    installPrerequisites()
     bash("make clean jclean", rocksDir, envVars, true)
 
     val hostArch = getUnixHostArch()
@@ -52,10 +51,6 @@ private fun checkoutRocksRepo(baseDir: Path, rocksDir: Path, gitVersion: String,
     bash("git checkout $gitVersion", rocksDir, envVars, true)
 }
 
-private fun installPrerequisites() {
-    bash("brew install cmake", Paths.get("."), mapOf(), false)
-}
-
 fun validateFileDescription(fileDir: Path, fileName: String, expectedFileDescriptionSubstring: String) {
     val fileDescription = bash("file $fileName", fileDir, mapOf(), true ).outputUTF8().trim()
     if (!fileDescription.contains(expectedFileDescriptionSubstring)) {
@@ -69,4 +64,5 @@ fun createZip(fileName: String, fileDir: Path, glob: String) {
         files += "${it.fileName} "
     }
     bash("zip $fileName ${files.trim()}", fileDir, mapOf(), true)
+    bash("pwd && ls", fileDir, mapOf(), true);
 }

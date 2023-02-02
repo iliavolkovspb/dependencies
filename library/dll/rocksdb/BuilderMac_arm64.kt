@@ -31,7 +31,7 @@ fun main(args: Array<String>) {
     validateFileDescription(buildDir, "librocksdb.dylib", "arm")
     val zipName = "librocksdb.zip"
     createZip(zipName, buildDir, "librocksdb*.dylib")
-    bash("mv ${buildDir.resolve(zipName)} $outFile", buildDir, mapOf(), true)
+    bash("mv ${buildDir.resolve(zipName)} $outFile", Paths.get("."), mapOf(), true)
 }
 
 private fun makeHost_arm64(rocksDir: Path) {

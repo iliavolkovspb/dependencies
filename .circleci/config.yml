@@ -48,7 +48,7 @@ jobs:
     steps:
       - checkout
       - install-bazel-mac
-      - run: bazel run --define version=$(cat library/dll/rocksdb/VERSION) //library/dll/rocksdb:deploy-mac-arm64 --sandbox_debug --verbose_failures
+      - run: bazel run --define version=$(cat library/dll/rocksdb/VERSION) //library/dll/rocksdb:deploy-mac-arm64 -- release
   deploy-rocksdb-shared-library-mac-x86_64:
     macos:
       xcode: "13.4.1"
@@ -56,7 +56,7 @@ jobs:
     steps:
       - checkout
       - install-bazel-mac
-      - run: bazel run --define version=$(cat library/dll/rocksdb/VERSION) //library/dll/rocksdb:deploy-mac-x86_64 --sandbox_debug --verbose_failures
+      - run: bazel run --define version=$(cat library/dll/rocksdb/VERSION) //library/dll/rocksdb:deploy-mac-x86_64 -- release
 
 workflows:
   dependencies:

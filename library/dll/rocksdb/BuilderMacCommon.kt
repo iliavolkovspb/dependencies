@@ -27,12 +27,17 @@ import java.nio.file.Paths
 import kotlin.io.path.forEachDirectoryEntry
 import kotlin.io.path.notExists
 
-fun buildMac(gitVersion: String, makeHost_arm64: (Path) -> Unit, makeHost_x86_64: (Path) -> Unit): Path {
+val ROCKS_VERSION_REGEX = Regex("\\d+\\.\\d+\\.\\d+")
+
+fun buildMac(versionNumber: String, makeHost_arm64: (Path) -> Unit, makeHost_x86_64: (Path) -> Unit): Path {
     if (getOS() != OS.MAC) throw RuntimeException("Mac builds only run on Mac operating systems.")
+    if (!ROCKS_VERSION_REGEX.matches(versionNumber)) {
+        throw RuntimeException("Version number '$versionNumber' should follow the major.minor.patch scheme.")
+    }
     val envVars: Map<String, String> = mapOf()
     val baseDir = Paths.get(".")
     val rocksDir = baseDir.resolve("rocksdb")
-    checkoutRocksRepo(baseDir, rocksDir, gitVersion, envVars)
+    checkoutRocksRepo(baseDir, rocksDir, "v$versionNumber", envVars)
     bash("make clean jclean", rocksDir, envVars, true)
 
     val hostArch = getUnixHostArch()

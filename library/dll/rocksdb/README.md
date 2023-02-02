@@ -7,15 +7,16 @@ The rules in this package build, package, and deploy RocksDB dynamic libraries a
 
 The general usage to compile RocksDB is:
 ```bazel
-bazel build --define version=v7.4.4 :compile-<os>-<arch>
+bazel build --define version=7.4.4 :compile-<os>-<arch>
 ```
 
 For example, to build a Mac arm64 shared library, we would run:
 ```bazel
-bazel build --define version=v7.4.4 :compile-mac-arm64
+bazel build --define version=7.4.4 :compile-mac-arm64
 ```
 
-The version number provided is a git within the RocksDB repository.
+The version number provided is a git within the RocksDB repository. Note that RocksDB uses a `v` prefix for version numbers,
+which should not be included in the `define` properties above.
 
 These rules will output a .zip including the main shared library plus possibly some symlinks to canonicalise the version names.
 
@@ -23,7 +24,7 @@ These rules will output a .zip including the main shared library plus possibly s
 
 To deploy instead of just producing the compiled files, we provide the repository username/password and run the deploy rule:
 ```bazel
-bazel run --define version=v7.4.4 :deploy-<os>-<arch>
+bazel run --define version=7.4.4 :deploy-<os>-<arch>
 ```
 
 ## Operating systems and architectures

@@ -48,6 +48,7 @@ jobs:
     steps:
       - checkout
       - install-bazel-mac
+      - run: sudo chown -R $(whoami) /usr/local/Cellar
       - run: bazel run --define version=$(cat library/dll/rocksdb/VERSION) //library/dll/rocksdb:deploy-mac-arm64
   deploy-rocksdb-shared-library-mac-x86_64:
     macos:
@@ -56,6 +57,7 @@ jobs:
     steps:
       - checkout
       - install-bazel-mac
+      - run: sudo chown -R $(whoami) /usr/local/Cellar
       - run: bazel run --define version=$(cat library/dll/rocksdb/VERSION) //library/dll/rocksdb:deploy-mac-x86_64
 
 workflows:

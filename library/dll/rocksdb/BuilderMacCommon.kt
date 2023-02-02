@@ -64,5 +64,6 @@ fun createZip(fileName: String, fileDir: Path, glob: String) {
         files += "${it.fileName} "
     }
     bash("zip $fileName ${files.trim()}", fileDir, mapOf(), true)
-    bash("pwd && ls", fileDir, mapOf(), true);
+    bash("pwd", fileDir, mapOf(), true);
+    bash("ls", fileDir, mapOf(), true);
 }

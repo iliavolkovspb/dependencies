@@ -159,6 +159,7 @@ artifacts = {
         "exclude": ["com.github.stefanbirkner:system-rules"],
         "version": "0.1"
     },
+    "io.micrometer:micrometer-core": "1.12.5",
     "io.netty:netty-all": "4.1.87.Final",
     "io.netty:netty-codec-http2": "4.1.87.Final",
     "io.netty:netty-handler": "4.1.87.Final",
